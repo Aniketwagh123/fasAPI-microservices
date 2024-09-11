@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  api_gateway:
+    build:
+      context: ./api_gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - EMPLOYEE_SERVICE_URL=http://employee_service:8000
+      - PAYROLL_SERVICE_URL=http://payroll_service:8000
+    depends_on:
+      - employee_service
+      - payroll_service
+
+  employee_service:
+    build:
+      context: ./employee_service
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=mongodb://mongo:27017/employee_db
+      - RABBITMQ_URL=amqp://rabbitmq
+    depends_on:
+      - rabbitmq
+      - mongo
+
+  payroll_service:
+    build:
+      context: ./payroll_service
+    ports:
+      - "8002:8000"
+    environment:
+      - DATABASE_URL=mongodb://mongo:27017/payroll_db
+      - RABBITMQ_URL=amqp://rabbitmq
+    depends_on:
+      - rabbitmq
+      - mongo
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  mongo:
+    image: "mongo:latest"
+    ports:
+      - "27017:27017"
