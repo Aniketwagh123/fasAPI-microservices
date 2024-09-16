@@ -13,3 +13,6 @@ def start_consuming():
     channel.queue_declare(queue='payroll_queue', durable=True)
     channel.basic_consume(queue='payroll_queue', on_message_callback=callback)
     channel.start_consuming()
+
+
+    # RPC 
